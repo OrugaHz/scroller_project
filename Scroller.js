@@ -10,14 +10,11 @@ class Scroller {
         // this.currentSectionIndex = currentSectionIndex < 0 ? 0 : currentSectionIndex;
         this.currentSectionIndex = Math.max(currentSectionIndex, 0);
 
-        console.log(this.currentSectionIndex);
-
-
         this.isThrottled = false;
 
         // kiedy zwykła funkcja, a chcemy zbindować
         // this.listenScroll = this.listenScroll.bind(this);
-
+        this.drawNavigation();
     }
 
     isScrolledIntoView(el) {
@@ -58,9 +55,48 @@ class Scroller {
     }
 
     scrollToCurrentSection = () => {
+        this.selectActiveItem();
         this.sections[this.currentSectionIndex].scrollIntoView({
             behavior: 'smooth',
             block: 'start',
         })
+    }
+
+    drawNavigation = () => {
+        this.navigationContainer = document.createElement('aside');
+        this.navigationContainer.setAttribute('class', 'scroller__navigation');
+        const list = document.createElement('ul');
+        this.sections.forEach((section, index) => {
+            const listItem = document.createElement('li');
+
+            listItem.addEventListener('click', () => {
+                this.currentSectionIndex = index;
+
+                this.scrollToCurrentSection();
+            })
+
+            list.appendChild(listItem);
+        })
+
+        this.navigationContainer.appendChild(list);
+
+        document.body.appendChild(this.navigationContainer);
+
+        this.selectActiveItem()
+    }
+
+    selectActiveItem = () => {
+        if (this.navigationContainer) {
+
+            const navigationItem = this.navigationContainer.querySelectorAll('li');
+
+            navigationItem.forEach((item, index) => {
+                if (index === this.currentSectionIndex) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            })
+        }
     }
 }
